@@ -69,120 +69,116 @@
     <p>This is the C# solution for the Roads and Libraries problem.</p>
     <h2>Source Code</h2>
     <pre><code>
-        using System.CodeDom.Compiler;
-        using System.Collections.Generic;
-        using System.Collections;
-        using System.ComponentModel;
-        using System.Diagnostics.CodeAnalysis;
-        using System.Globalization;
-        using System.IO;
-        using System.Linq;
-        using System.Reflection;
-        using System.Runtime.Serialization;
-        using System.Text.RegularExpressions;
-        using System.Text;
         using System;
-        
-        class Result
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+class Result
+{
+    // Function to compute the minimum cost to provide access to libraries
+    public static long roadsAndLibraries(int n, int c_lib, int c_road, List<List<int>> cities)
+    {
+        // If the cost of building a library is less than or equal to the cost of a road,
+        // it's cheaper to build a library in every city rather than connecting them.
+        if (c_lib <= c_road)
         {
-            public static long roadsAndLibraries(int n, int c_lib, int c_road, List<List<int>> cities)
+            return (long)n * c_lib;
+        }
+
+        // Initialize adjacency list to represent the graph
+        List<int>[] adjacencyList = new List<int>[n + 1];
+        for (int i = 1; i <= n; i++)
+        {
+            adjacencyList[i] = new List<int>();
+        }
+
+        // Build the graph by adding bidirectional roads between cities
+        foreach (var road in cities)
+        {
+            int city1 = road[0];
+            int city2 = road[1];
+            adjacencyList[city1].Add(city2);
+            adjacencyList[city2].Add(city1);
+        }
+
+        bool[] visited = new bool[n + 1]; // Keep track of visited cities
+        long totalCost = 0;
+
+        // Iterate through each city and perform DFS for unvisited components
+        for (int i = 1; i <= n; i++)
+        {
+            if (!visited[i])
             {
-                if (c_lib <= c_road)
-                {
-                    return (long)n * c_lib;
-                }
-        
-                List<int>[] adjacencyList = new List<int>[n + 1];
-                for (int i = 1; i <= n; i++)
-                {
-                    adjacencyList[i] = new List<int>();
-                }
-        
-                foreach (var road in cities)
-                {
-                    int city1 = road[0];
-                    int city2 = road[1];
-                    adjacencyList[city1].Add(city2);
-                    adjacencyList[city2].Add(city1);
-                }
-        
-                bool[] visited = new bool[n + 1];
-                long totalCost = 0;
-        
-                for (int i = 1; i <= n; i++)
-                {
-                    if (!visited[i])
-                    {
-                        int componentSize = DFS(i, adjacencyList, visited);
-                        totalCost += c_lib + (componentSize - 1) * c_road;
-                    }
-                }
-        
-                return totalCost;
-            }
-        
-            private static int DFS(int node, List<int>[] adjacencyList, bool[] visited)
-            {
-                Stack<int> stack = new Stack<int>();
-                stack.Push(node);
-                visited[node] = true;
-                int size = 0;
-        
-                while (stack.Count > 0)
-                {
-                    int current = stack.Pop();
-                    size++;
-        
-                    foreach (int neighbor in adjacencyList[current])
-                    {
-                        if (!visited[neighbor])
-                        {
-                            visited[neighbor] = true;
-                            stack.Push(neighbor);
-                        }
-                    }
-                }
-        
-                return size;
+                int componentSize = DFS(i, adjacencyList, visited);
+                // Each component requires one library and (size - 1) roads
+                totalCost += c_lib + (componentSize - 1) * c_road;
             }
         }
-        
-        class Solution
+
+        return totalCost;
+    }
+
+    // Depth-First Search (DFS) function to explore a connected component
+    private static int DFS(int node, List<int>[] adjacencyList, bool[] visited)
+    {
+        Stack<int> stack = new Stack<int>();
+        stack.Push(node);
+        visited[node] = true;
+        int size = 0; // To count the number of cities in the component
+
+        while (stack.Count > 0)
         {
-            public static void Main(string[] args)
+            int current = stack.Pop();
+            size++;
+
+            // Visit all unvisited neighboring cities
+            foreach (int neighbor in adjacencyList[current])
             {
-                TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
-        
-                int q = Convert.ToInt32(Console.ReadLine().Trim());
-        
-                for (int qItr = 0; qItr < q; qItr++)
+                if (!visited[neighbor])
                 {
-                    string[] firstMultipleInput = Console.ReadLine().TrimEnd().Split(' ');
-        
-                    int n = Convert.ToInt32(firstMultipleInput[0]);
-        
-                    int m = Convert.ToInt32(firstMultipleInput[1]);
-        
-                    int c_lib = Convert.ToInt32(firstMultipleInput[2]);
-        
-                    int c_road = Convert.ToInt32(firstMultipleInput[3]);
-        
-                    List<List<int>> cities = new List<List<int>>();
-        
-                    for (int i = 0; i < m; i++)
-                    {
-                        cities.Add(Console.ReadLine().TrimEnd().Split(' ').ToList().Select(citiesTemp => Convert.ToInt32(citiesTemp)).ToList());
-                    }
-        
-                    long result = Result.roadsAndLibraries(n, c_lib, c_road, cities);
-        
-                    textWriter.WriteLine(result);
+                    visited[neighbor] = true;
+                    stack.Push(neighbor);
                 }
-        
-                textWriter.Flush();
-                textWriter.Close();
             }
         }
+
+        return size;
+    }
+}
+
+class Solution
+{
+    public static void Main(string[] args)
+    {
+        TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
+
+        int q = Convert.ToInt32(Console.ReadLine().Trim()); // Number of test cases
+
+        for (int qItr = 0; qItr < q; qItr++)
+        {
+            string[] firstMultipleInput = Console.ReadLine().TrimEnd().Split(' ');
+            int n = Convert.ToInt32(firstMultipleInput[0]); // Number of cities
+            int m = Convert.ToInt32(firstMultipleInput[1]); // Number of roads
+            int c_lib = Convert.ToInt32(firstMultipleInput[2]); // Cost of building a library
+            int c_road = Convert.ToInt32(firstMultipleInput[3]); // Cost of building a road
+
+            List<List<int>> cities = new List<List<int>>();
+
+            for (int i = 0; i < m; i++)
+            {
+                cities.Add(Console.ReadLine().TrimEnd().Split(' ').Select(int.Parse).ToList());
+            }
+
+            long result = Result.roadsAndLibraries(n, c_lib, c_road, cities);
+            textWriter.WriteLine(result);
+        }
+
+        textWriter.Flush();
+        textWriter.Close();
+    }
+}
+
     </code></pre>
 </body>
 </html>
