@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roads and Libraries</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        pre { background-color: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        code { font-family: monospace; color: #333; }
+    </style>
+</head>
+<body>
+    <h1>Roads and Libraries - C# Implementation</h1>
+    <p>This is the C# solution for the Roads and Libraries problem.</p>
+    <h2>Source Code</h2>
+    <pre><code>
+        using System.CodeDom.Compiler;
+        using System.Collections.Generic;
+        using System.Collections;
+        using System.ComponentModel;
+        using System.Diagnostics.CodeAnalysis;
+        using System.Globalization;
+        using System.IO;
+        using System.Linq;
+        using System.Reflection;
+        using System.Runtime.Serialization;
+        using System.Text.RegularExpressions;
+        using System.Text;
+        using System;
+        
+        class Result
+        {
+            public static long roadsAndLibraries(int n, int c_lib, int c_road, List<List<int>> cities)
+            {
+                if (c_lib <= c_road)
+                {
+                    return (long)n * c_lib;
+                }
+        
+                List<int>[] adjacencyList = new List<int>[n + 1];
+                for (int i = 1; i <= n; i++)
+                {
+                    adjacencyList[i] = new List<int>();
+                }
+        
+                foreach (var road in cities)
+                {
+                    int city1 = road[0];
+                    int city2 = road[1];
+                    adjacencyList[city1].Add(city2);
+                    adjacencyList[city2].Add(city1);
+                }
+        
+                bool[] visited = new bool[n + 1];
+                long totalCost = 0;
+        
+                for (int i = 1; i <= n; i++)
+                {
+                    if (!visited[i])
+                    {
+                        int componentSize = DFS(i, adjacencyList, visited);
+                        totalCost += c_lib + (componentSize - 1) * c_road;
+                    }
+                }
+        
+                return totalCost;
+            }
+        
+            private static int DFS(int node, List<int>[] adjacencyList, bool[] visited)
+            {
+                Stack<int> stack = new Stack<int>();
+                stack.Push(node);
+                visited[node] = true;
+                int size = 0;
+        
+                while (stack.Count > 0)
+                {
+                    int current = stack.Pop();
+                    size++;
+        
+                    foreach (int neighbor in adjacencyList[current])
+                    {
+                        if (!visited[neighbor])
+                        {
+                            visited[neighbor] = true;
+                            stack.Push(neighbor);
+                        }
+                    }
+                }
+        
+                return size;
+            }
+        }
+        
+        class Solution
+        {
+            public static void Main(string[] args)
+            {
+                TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
+        
+                int q = Convert.ToInt32(Console.ReadLine().Trim());
+        
+                for (int qItr = 0; qItr < q; qItr++)
+                {
+                    string[] firstMultipleInput = Console.ReadLine().TrimEnd().Split(' ');
+        
+                    int n = Convert.ToInt32(firstMultipleInput[0]);
+        
+                    int m = Convert.ToInt32(firstMultipleInput[1]);
+        
+                    int c_lib = Convert.ToInt32(firstMultipleInput[2]);
+        
+                    int c_road = Convert.ToInt32(firstMultipleInput[3]);
+        
+                    List<List<int>> cities = new List<List<int>>();
+        
+                    for (int i = 0; i < m; i++)
+                    {
+                        cities.Add(Console.ReadLine().TrimEnd().Split(' ').ToList().Select(citiesTemp => Convert.ToInt32(citiesTemp)).ToList());
+                    }
+        
+                    long result = Result.roadsAndLibraries(n, c_lib, c_road, cities);
+        
+                    textWriter.WriteLine(result);
+                }
+        
+                textWriter.Flush();
+                textWriter.Close();
+            }
+        }
+    </code></pre>
+</body>
+</html>
