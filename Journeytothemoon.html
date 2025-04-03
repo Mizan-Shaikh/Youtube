@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Journey to the moon | HackerRank Solution</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+<style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 40px;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        h1, h2 {
+            color: #f8f8f2;
+        }
+        pre {
+            border-radius: 8px;
+            overflow: auto;
+            padding: 16px;
+            position: relative;
+        }
+        code {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+    </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        hljs.highlightAll();
+
+        document.querySelectorAll("pre").forEach(pre => {
+            const button = document.createElement("button");
+            button.innerText = "Copy";
+            button.classList.add("copy-btn");
+            pre.appendChild(button);
+
+            button.addEventListener("click", () => {
+                const code = pre.querySelector("code").innerText;
+                navigator.clipboard.writeText(code).then(() => {
+                    button.innerText = "Copied!";
+                    setTimeout(() => (button.innerText = "Copy"), 2000);
+                });
+            });
+        });
+    });
+</script>
+
+</head>
+<body>
+     <h1>Journey to the moon - HackerRank Solution</h1>
+    <p>This is the C# solution for the <a href="https://www.hackerrank.com/challenges/journey-to-the-moon/problem" target="_blank" style="color: #1E90FF;">Journey to the moon</a> problem from HackerRank.</p>
+    
+    <h2>Source Code</h2>
+    <pre><code>
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+class Result
+{
+    public static int journeyToMoon(int n, List<List<int>> astronaut)
+    {
+        // Graph representation using adjacency list
+        List<int>[] graph = new List<int>[n];
+        for (int i = 0; i < n; i++)
+        {
+            graph[i] = new List<int>();
+        }
+
+        // Build the graph
+        foreach (var pair in astronaut)
+        {
+            graph[pair[0]].Add(pair[1]);
+            graph[pair[1]].Add(pair[0]);
+        }
+
+        bool[] visited = new bool[n];
+        List<int> componentSizes = new List<int>();
+
+        // DFS to find connected components
+        for (int i = 0; i < n; i++)
+        {
+            if (!visited[i])
+            {
+                int size = DFS(graph, visited, i);
+                componentSizes.Add(size);
+            }
+        }
+
+        // Compute total valid pairs
+        long totalPairs = (long)n * (n - 1) / 2; // Total ways to pick 2 astronauts
+        long sameCountryPairs = 0;
+
+        foreach (int size in componentSizes)
+        {
+            sameCountryPairs += (long)size * (size - 1) / 2; // Pairs within the same component
+        }
+
+        return (int)(totalPairs - sameCountryPairs);
+    }
+
+    private static int DFS(List<int>[] graph, bool[] visited, int node)
+    {
+        Stack<int> stack = new Stack<int>();
+        stack.Push(node);
+        visited[node] = true;
+        int size = 1;
+
+        while (stack.Count > 0)
+        {
+            int current = stack.Pop();
+            foreach (int neighbor in graph[current])
+            {
+                if (!visited[neighbor])
+                {
+                    visited[neighbor] = true;
+                    stack.Push(neighbor);
+                    size++;
+                }
+            }
+        }
+
+        return size;
+    }
+}
+
+class Solution
+{
+    public static void Main(string[] args)
+    {
+        TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
+
+        string[] firstMultipleInput = Console.ReadLine().TrimEnd().Split(' ');
+
+        int n = Convert.ToInt32(firstMultipleInput[0]);
+        int p = Convert.ToInt32(firstMultipleInput[1]);
+
+        List<List<int>> astronaut = new List<List<int>>();
+
+        for (int i = 0; i < p; i++)
+        {
+            astronaut.Add(Console.ReadLine().TrimEnd().Split(' ').ToList().Select(int.Parse).ToList());
+        }
+
+        int result = Result.journeyToMoon(n, astronaut);
+
+        textWriter.WriteLine(result);
+        textWriter.Flush();
+        textWriter.Close();
+    }
+}
+
+
+    </code></pre>
+</body>
+</html>
