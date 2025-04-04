@@ -1,98 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Synchronous Shopping | HackerRank Solution</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Synchronous Shopping | HackerRank Solution</title>
 
-    <!-- Dracula Theme for Highlight.js -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/dracula.min.css">
+  <!-- ✅ Light Colorful Theme: GitHub -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
 
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            margin: 40px;
-            background-color: #121212;
-            color: #e0e0e0;
-        }
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 40px;
+      background-color: #ffffff;
+      color: #333333;
+    }
 
-        h1, h2 {
-            color: #f8f8f2;
-        }
+    h1, h2 {
+      color: #24292f;
+    }
 
-        a {
-            color: #8be9fd;
-            text-decoration: none;
-        }
+    a {
+      color: #0366d6;
+      text-decoration: none;
+    }
 
-        a:hover {
-            text-decoration: underline;
-        }
+    a:hover {
+      text-decoration: underline;
+    }
 
-        pre {
-            position: relative;
-            border-radius: 8px;
-            overflow: auto;
-            padding: 16px;
-            margin-top: 20px;
-        }
+    pre {
+      position: relative;
+      border-radius: 8px;
+      overflow: auto;
+      padding: 16px;
+      margin-top: 20px;
+      background-color: #f6f8fa;
+      border: 1px solid #d1d5da;
+    }
 
-        code {
-            font-family: 'Fira Code', 'Courier New', monospace;
-            font-size: 14px;
-        }
+    code {
+      font-family: 'Fira Code', 'Courier New', monospace;
+      font-size: 14px;
+    }
 
-        .copy-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(255, 255, 255, 0.15);
-            color: #fff;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 5px;
-            font-size: 12px;
-            transition: background 0.3s ease;
-        }
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(27, 31, 35, 0.05);
+      color: #24292f;
+      border: 1px solid #d1d5da;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 12px;
+      transition: background 0.3s ease;
+    }
 
-        .copy-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-    </style>
+    .copy-btn:hover {
+      background: rgba(27, 31, 35, 0.1);
+    }
+  </style>
 
-    <!-- Highlight.js Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- Highlight.js core -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            hljs.highlightAll();
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      hljs.highlightAll();
 
-            document.querySelectorAll("pre").forEach(pre => {
-                const button = document.createElement("button");
-                button.innerText = "Copy";
-                button.className = "copy-btn";
-                pre.appendChild(button);
+      document.querySelectorAll("pre").forEach(pre => {
+        const button = document.createElement("button");
+        button.innerText = "Copy";
+        button.className = "copy-btn";
+        pre.appendChild(button);
 
-                button.addEventListener("click", () => {
-                    const code = pre.querySelector("code").innerText;
-                    navigator.clipboard.writeText(code).then(() => {
-                        button.innerText = "Copied!";
-                        setTimeout(() => button.innerText = "Copy", 2000);
-                    });
-                });
-            });
+        button.addEventListener("click", () => {
+          const code = pre.querySelector("code").innerText;
+          navigator.clipboard.writeText(code).then(() => {
+            button.innerText = "Copied!";
+            setTimeout(() => button.innerText = "Copy", 2000);
+          });
         });
-    </script>
+      });
+    });
+  </script>
 </head>
 
 <body>
-    <h1>Synchronous Shopping - HackerRank Solution</h1>
-    <p>This is the C# solution for the <a href="https://www.hackerrank.com/challenges/synchronous-shopping/problem" target="_blank">Synchronous Shopping</a> problem from HackerRank.</p>
+  <h1>Synchronous Shopping - HackerRank Solution</h1>
+  <p>
+    This is the C# solution for the
+    <a href="https://www.hackerrank.com/challenges/synchronous-shopping/problem" target="_blank">
+      Synchronous Shopping
+    </a>
+    problem from HackerRank.
+  </p>
 
-    <h2>Source Code</h2>
-    <pre><code class="language-csharp">
-        class Result
+  <h2>Source Code</h2>
+  <pre><code class="language-csharp">
+ class Result
 {
 
     /*
@@ -223,6 +231,6 @@ class Solution
         textWriter.Close();
     }
 }
-    </code></pre>
+  </code></pre>
 </body>
 </html>
