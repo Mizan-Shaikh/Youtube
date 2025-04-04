@@ -3,75 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title>Synchronous Shopping | HackerRank Solution</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/dracula.min.css">
-<style>
+    <title>Synchronous Shopping | HackerRank Solution</title>
+
+    <!-- Dracula Theme for Highlight.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/dracula.min.css">
+
+    <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             margin: 40px;
             background-color: #121212;
             color: #e0e0e0;
         }
+
         h1, h2 {
             color: #f8f8f2;
         }
+
+        a {
+            color: #8be9fd;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
         pre {
+            position: relative;
             border-radius: 8px;
             overflow: auto;
             padding: 16px;
-            position: relative;
+            margin-top: 20px;
         }
+
         code {
-            font-family: 'Courier New', monospace;
+            font-family: 'Fira Code', 'Courier New', monospace;
             font-size: 14px;
         }
+
         .copy-btn {
             position: absolute;
             top: 10px;
             right: 10px;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
             color: #fff;
             border: none;
             padding: 5px 10px;
             cursor: pointer;
             border-radius: 5px;
             font-size: 12px;
+            transition: background 0.3s ease;
         }
+
         .copy-btn:hover {
-            background: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.3);
         }
     </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        hljs.highlightAll();
 
-        document.querySelectorAll("pre").forEach(pre => {
-            const button = document.createElement("button");
-            button.innerText = "Copy";
-            button.classList.add("copy-btn");
-            pre.appendChild(button);
+    <!-- Highlight.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
 
-            button.addEventListener("click", () => {
-                const code = pre.querySelector("code").innerText;
-                navigator.clipboard.writeText(code).then(() => {
-                    button.innerText = "Copied!";
-                    setTimeout(() => (button.innerText = "Copy"), 2000);
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            hljs.highlightAll();
+
+            document.querySelectorAll("pre").forEach(pre => {
+                const button = document.createElement("button");
+                button.innerText = "Copy";
+                button.className = "copy-btn";
+                pre.appendChild(button);
+
+                button.addEventListener("click", () => {
+                    const code = pre.querySelector("code").innerText;
+                    navigator.clipboard.writeText(code).then(() => {
+                        button.innerText = "Copied!";
+                        setTimeout(() => button.innerText = "Copy", 2000);
+                    });
                 });
             });
         });
-    });
-</script>
-
+    </script>
 </head>
-<body>
-     <h1>Synchronous Shopping - HackerRank Solution</h1>
-    <p>This is the C# solution for the <a href="https://www.hackerrank.com/challenges/synchronous-shopping/problem" target="_blank" style="color: #1E90FF;">Synchronous Shopping</a> problem from HackerRank.</p>
-    
-    <h2>Source Code</h2>
-    <pre><code>
 
-class Result
+<body>
+    <h1>Synchronous Shopping - HackerRank Solution</h1>
+    <p>This is the C# solution for the <a href="https://www.hackerrank.com/challenges/synchronous-shopping/problem" target="_blank">Synchronous Shopping</a> problem from HackerRank.</p>
+
+    <h2>Source Code</h2>
+    <pre><code class="language-csharp">
+        class Result
 {
 
     /*
@@ -159,34 +180,10 @@ class Result
        }
        
        return answer;
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-        
+ 
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 class Solution
@@ -226,7 +223,6 @@ class Solution
         textWriter.Close();
     }
 }
-
     </code></pre>
 </body>
 </html>
