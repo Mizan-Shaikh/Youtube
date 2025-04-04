@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Synchronous Shopping | HackerRank Solution</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/dracula.min.css">
+<style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 40px;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        h1, h2 {
+            color: #f8f8f2;
+        }
+        pre {
+            border-radius: 8px;
+            overflow: auto;
+            padding: 16px;
+            position: relative;
+        }
+        code {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+    </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        hljs.highlightAll();
+
+        document.querySelectorAll("pre").forEach(pre => {
+            const button = document.createElement("button");
+            button.innerText = "Copy";
+            button.classList.add("copy-btn");
+            pre.appendChild(button);
+
+            button.addEventListener("click", () => {
+                const code = pre.querySelector("code").innerText;
+                navigator.clipboard.writeText(code).then(() => {
+                    button.innerText = "Copied!";
+                    setTimeout(() => (button.innerText = "Copy"), 2000);
+                });
+            });
+        });
+    });
+</script>
+
+</head>
+<body>
+     <h1>Synchronous Shopping - HackerRank Solution</h1>
+    <p>This is the C# solution for the <a href="https://www.hackerrank.com/challenges/synchronous-shopping/problem" target="_blank" style="color: #1E90FF;">Synchronous Shopping</a> problem from HackerRank.</p>
+    
+    <h2>Source Code</h2>
+    <pre><code>
+
+class Result
+{
+
+    /*
+     * Complete the 'shop' function below.
+     *
+     * The function is expected to return an INTEGER.
+     * The function accepts following parameters:
+     *  1. INTEGER n
+     *  2. INTEGER k
+     *  3. STRING_ARRAY centers
+     *  4. 2D_INTEGER_ARRAY roads
+     */
+
+    public static int shop(int n, int k, List<string> centers, List<List<int>> roads)
+    {
+       
+       // step 1: Store Fish information using Bitmasking
+       int[] fishTypes = new int[n];
+       for(int i = 0; i < n; i++)
+       {
+          string[] centerData = centers[i].Split();
+          int fishCount = int.Parse(centerData[0]);
+          int fishMask = 0;
+          for (int j = 1; j <= fishCount; j++){
+             int fishType = int.Parse(centerData[j]) - 1;
+             fishMask |= (1 << fishType); // Bitmasking to store collected fish
+          }
+          fishTypes[i] = fishMask;          
+       }
+       
+       // step 2: Build the Graph
+       List<(int, int)>[] graph = new List<(int, int)>[n];
+       for (int i = 0; i < n; i++){
+         graph[i] = new List<(int, int)>();
+       }
+       
+       foreach(var road in roads){
+          int u = road[0] - 1, v = road[1] - 1, travelTime = road[2];
+          graph[u].Add((v, travelTime));
+          graph[v].Add((u, travelTime)); //Bi directional road
+       }
+       
+       // Step 3: Use Dijkstra's algorightm with Bitmasking for two cats
+       const int INF = int.MaxValue;
+       int[,] minTime = new int[n, 1 << k];
+       for(int i = 0; i < n; i++){
+          for(int j = 0; j < (1 << k); j++){
+              minTime[i, j] = INF;
+          }
+       }
+       
+       var pq = new SortedSet<(int cost, int node, int fishMask)>();
+       pq.Add((0, 0 , fishTypes[0]));
+       minTime[0, fishTypes[0]] = 0;
+       
+       while(pq.Count > 0)
+       {
+          var (currentCost, currentNode, currentMask) = pq.Min;
+          pq.Remove(pq.Min);
+          
+          foreach(var (neighor, weight) in graph[currentNode])
+          {
+              int newMask = currentMask | fishTypes[neighor];
+              int newCost = currentCost + weight;
+              
+              if (newCost < minTime[neighor, newMask])
+              {
+                  pq.Add((newCost, neighor, newMask));
+                  minTime[neighor, newMask] = newCost;
+              }
+          }
+       }
+       
+       // Step 4: Find Optimal Meeting Time for Two Cats
+       int answer = INF;
+       for (int i = 0; i < (1 << k); i++)
+       {
+          for(int j = 0; j < (i << k); j++)
+          {
+             if((i | j) == (1 << k) - 1)
+             {
+                answer = Math.Min(answer, Math.Max(minTime[n - 1, i], minTime[n - 1, j]));
+             }
+          }
+       }
+       
+       return answer;
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+        
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Solution
+{
+    public static void Main(string[] args)
+    {
+        TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
+
+        string[] firstMultipleInput = Console.ReadLine().TrimEnd().Split(' ');
+
+        int n = Convert.ToInt32(firstMultipleInput[0]);
+
+        int m = Convert.ToInt32(firstMultipleInput[1]);
+
+        int k = Convert.ToInt32(firstMultipleInput[2]);
+
+        List<string> centers = new List<string>();
+
+        for (int i = 0; i < n; i++)
+        {
+            string centersItem = Console.ReadLine();
+            centers.Add(centersItem);
+        }
+
+        List<List<int>> roads = new List<List<int>>();
+
+        for (int i = 0; i < m; i++)
+        {
+            roads.Add(Console.ReadLine().TrimEnd().Split(' ').ToList().Select(roadsTemp => Convert.ToInt32(roadsTemp)).ToList());
+        }
+
+        int res = Result.shop(n, k, centers, roads);
+
+        textWriter.WriteLine(res);
+
+        textWriter.Flush();
+        textWriter.Close();
+    }
+}
+
+    </code></pre>
+</body>
+</html>
