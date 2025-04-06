@@ -1,0 +1,123 @@
+using System;
+using System.Collections.Generic;
+
+class KruskalMST
+{
+    // Step 1: Define a structure to represent an edge in the graph
+    public class Edge : IComparable<Edge>
+    {
+        public int Source, Destination, Weight;
+
+        public int CompareTo(Edge other)
+        {
+            // Compare edges based on their weight for sorting
+            return this.Weight.CompareTo(other.Weight);
+        }
+    }
+
+    // Step 2: Define a structure to represent a subset for union-find
+    public class Subset
+    {
+        public int Parent, Rank;
+    }
+
+    // Step 3: Find the root of the set in which element 'i' is present
+    int Find(Subset[] subsets, int i)
+    {
+        // Path Compression: Update parent to root of the set
+        if (subsets[i].Parent != i)
+            subsets[i].Parent = Find(subsets, subsets[i].Parent);
+        return subsets[i].Parent;
+    }
+
+    // Step 4: Perform union of two sets 'x' and 'y'
+    void Union(Subset[] subsets, int x, int y)
+    {
+        int xRoot = Find(subsets, x);
+        int yRoot = Find(subsets, y);
+
+        // Attach smaller rank tree under root of higher rank tree
+        if (subsets[xRoot].Rank < subsets[yRoot].Rank)
+            subsets[xRoot].Parent = yRoot;
+        else if (subsets[xRoot].Rank > subsets[yRoot].Rank)
+            subsets[yRoot].Parent = xRoot;
+        else
+        {
+            // If ranks are same, make one as root and increment its rank
+            subsets[yRoot].Parent = xRoot;
+            subsets[xRoot].Rank++;
+        }
+    }
+
+    // Step 5: Construct MST using Kruskal's algorithm
+    public int Kruskal(List<Edge> edges, int verticesCount)
+    {
+        // Step 5.1: Sort all edges in non-decreasing order of their weight
+        edges.Sort();
+
+        // Step 5.2: Allocate memory for creating V subsets
+        Subset[] subsets = new Subset[verticesCount + 1];
+        for (int v = 0; v <= verticesCount; ++v)
+        {
+            subsets[v] = new Subset { Parent = v, Rank = 0 };
+        }
+
+        int mstWeight = 0; // Initialize result
+
+        // Step 5.3: Number of edges to be taken is equal to V-1
+        int e = 0; // Index variable, used for sorted edges
+        int i = 0; // Index variable, used for result[]
+
+        // Step 5.4: Pick the smallest edge and increment the index for next iteration
+        while (e < verticesCount - 1 && i < edges.Count)
+        {
+            // Step 5.4.1: Pick the smallest edge. And increment the index for next iteration
+            Edge nextEdge = edges[i++];
+
+            int x = Find(subsets, nextEdge.Source);
+            int y = Find(subsets, nextEdge.Destination);
+
+            // Step 5.4.2: If including this edge doesn't cause cycle, include it in result
+            // and increment the index of result for next edge
+            if (x != y)
+            {
+                mstWeight += nextEdge.Weight;
+                Union(subsets, x, y);
+                e++;
+            }
+            // Else discard the nextEdge
+        }
+
+        return mstWeight;
+    }
+}
+
+class Solution
+{
+    static void Main(string[] args)
+    {
+        // Step 6: Read input and construct the graph
+        string[] tokens = Console.ReadLine().Split();
+        int verticesCount = int.Parse(tokens[0]);
+        int edgesCount = int.Parse(tokens[1]);
+
+        List<KruskalMST.Edge> edges = new List<KruskalMST.Edge>();
+
+        for (int i = 0; i < edgesCount; i++)
+        {
+            tokens = Console.ReadLine().Split();
+            int source = int.Parse(tokens[0]);
+            int destination = int.Parse(tokens[1]);
+            int weight = int.Parse(tokens[2]);
+
+            edges.Add(new KruskalMST.Edge { Source = source, Destination = destination, Weight = weight });
+        }
+
+        // Step 7: Create an instance of KruskalMST and compute the MST weight
+        KruskalMST kruskal = new KruskalMST();
+        int mstWeight = kruskal.Kruskal(edges, verticesCount);
+
+        // Step 8: Output the total weight of the MST
+        Console.WriteLine(mstWeight);
+    }
+}
