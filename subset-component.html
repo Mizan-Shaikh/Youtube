@@ -1,0 +1,122 @@
+using System;
+using System.Collections.Generic;
+
+class Solution
+{
+    /// <summary>
+    /// Counts the number of set bits (1s) in the binary representation of a 64-bit unsigned integer.
+    /// </summary>
+    /// <param name="n">The unsigned long integer to count set bits in.</param>
+    /// <returns>The count of set bits.</returns>
+    static int CountSetBits(ulong n)
+    {
+        int count = 0;
+        while (n > 0)
+        {
+            // Increment count if the least significant bit is set
+            count += (int)(n & 1);
+            // Right shift n by 1 to check the next bit
+            n >>= 1;
+        }
+        return count;
+    }
+
+    /// <summary>
+    /// Determines the number of connected components in the graph formed by the subset.
+    /// </summary>
+    /// <param name="subset">The subset of integers representing the graph.</param>
+    /// <returns>The number of connected components.</returns>
+    static int FindConnectedComponents(List<int> subset)
+    {
+        ulong combined = 0;
+        // Combine all numbers in the subset using bitwise OR to find the overall set bits
+        foreach (var num in subset)
+        {
+            combined |= (ulong)num;
+        }
+
+        // Count the total number of set bits in the combined result
+        int totalSetBits = CountSetBits(combined);
+
+        // Initial connected components count: 64 nodes minus the number of set bits
+        int connectedComponents = 64 - totalSetBits;
+
+        // Array to track visited nodes during DFS
+        bool[] visited = new bool[64];
+
+        // Perform DFS to find and count connected components among the set bits
+        for (int i = 0; i < 64; i++)
+        {
+            // If bit i is set and not yet visited, perform DFS from this node
+            if (((combined >> i) & 1) == 1 && !visited[i])
+            {
+                DFS(combined, i, visited);
+                // Increment connected components count after exploring a component
+                connectedComponents++;
+            }
+        }
+
+        return connectedComponents;
+    }
+
+    /// <summary>
+    /// Performs a depth-first search to traverse and mark visited nodes in the graph.
+    /// </summary>
+    /// <param name="combined">The combined bit representation of the subset.</param>
+    /// <param name="node">The starting node for DFS.</param>
+    /// <param name="visited">Array tracking visited nodes.</param>
+    static void DFS(ulong combined, int node, bool[] visited)
+    {
+        Stack<int> stack = new Stack<int>();
+        stack.Push(node);
+
+        while (stack.Count > 0)
+        {
+            int current = stack.Pop();
+            if (!visited[current])
+            {
+                visited[current] = true;
+                // Check all possible nodes for connection
+                for (int i = 0; i < 64; i++)
+                {
+                    // If node i is different from current, both bits are set, and i is not visited
+                    if (i != current && ((combined >> i) & 1) == 1 && ((combined >> current) & 1) == 1)
+                    {
+                        stack.Push(i);
+                    }
+                }
+            }
+        }
+    }
+
+    static void Main(string[] args)
+    {
+        // Read the number of elements in the array
+        int n = int.Parse(Console.ReadLine());
+        // Read the array elements and convert them to integers
+        int[] d = Array.ConvertAll(Console.ReadLine().Split(), int.Parse);
+
+        int totalConnectedComponents = 0;
+        // Total number of subsets is 2^n
+        int subsetCount = 1 << n;
+
+        // Iterate over all possible subsets using bitmasking
+        for (int mask = 0; mask < subsetCount; mask++)
+        {
+            List<int> subset = new List<int>();
+            for (int i = 0; i < n; i++)
+            {
+                // If the i-th bit in mask is set, include d[i] in the subset
+                if ((mask & (1 << i)) != 0)
+                {
+                    subset.Add(d[i]);
+                }
+            }
+            // Calculate the number of connected components for the current subset
+            totalConnectedComponents += FindConnectedComponents(subset);
+        }
+
+        // Output the total count of connected components across all subsets
+        Console.WriteLine(totalConnectedComponents);
+    }
+}
