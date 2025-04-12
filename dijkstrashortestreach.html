@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dijkstra: Shortest Reach 2 | HackerRank Solution</title>
+
+  <!-- Night Owl Theme for Highlight.js -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/night-owl.min.css">
+
+  <!-- Optional: Fira Code font for better developer aesthetics -->
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #011627;
+      color: #ffffff;
+      margin: 20px;
+      line-height: 1.6;
+      font-size: 18px;
+    }
+
+    h1, h2 {
+      color: #82aaff;
+    }
+
+    a {
+      color: #7fdbca;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    pre {
+      position: relative;
+      border-radius: 10px;
+      overflow: auto;
+      padding: 20px;
+      margin-top: 20px;
+      background-color: #011627;
+    }
+
+    code {
+      font-family: 'Fira Code', 'Courier New', monospace;
+      font-size: 16px;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 6px 12px;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Ensure responsiveness on small screens */
+    @media (max-width: 600px) {
+      body {
+        font-size: 16px;
+        margin: 15px;
+      }
+
+      pre {
+        font-size: 15px;
+        padding: 15px;
+      }
+
+      .copy-btn {
+        top: 8px;
+        right: 8px;
+        font-size: 12px;
+        padding: 5px 10px;
+      }
+    }
+  </style>
+
+  <!-- Highlight.js Core Script -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      hljs.highlightAll();
+
+      document.querySelectorAll("pre").forEach(pre => {
+        const button = document.createElement("button");
+        button.innerText = "Copy";
+        button.className = "copy-btn";
+        pre.appendChild(button);
+
+        button.addEventListener("click", () => {
+          const code = pre.querySelector("code").innerText;
+          navigator.clipboard.writeText(code).then(() => {
+            button.innerText = "Copied!";
+            setTimeout(() => button.innerText = "Copy", 2000);
+          });
+        });
+      });
+    });
+  </script>
+</head>
+
+<body>
+  <h1>Dijkstra: Shortest Reach 2 - HackerRank Solution</h1>
+  <p>
+    This is the C# solution for the
+    <a href="https://www.hackerrank.com/challenges/dijkstrashortreach/problem" target="_blank">
+      Dijkstra: Shortest Reach 2
+    </a>
+    problem from HackerRank.
+  </p>
+
+  <h2>Source Code</h2>
+  <pre><code class="language-csharp">
+ 
+using System;
+using System.Collections.Generic;
+
+class Solution
+{
+    // Step 1: Define the Edge class to represent graph edges
+    class Edge
+    {
+        public int To { get; set; }
+        public int Weight { get; set; }
+
+        public Edge(int to, int weight)
+        {
+            To = to;
+            Weight = weight;
+        }
+    }
+
+    // Step 2: Implement a priority queue using a min-heap
+    class PriorityQueue<T>
+    {
+        private List<(int Priority, T Item)> heap = new List<(int, T)>();
+
+        public int Count => heap.Count;
+
+        public void Enqueue(int priority, T item)
+        {
+            heap.Add((priority, item));
+            int ci = heap.Count - 1;
+            while (ci > 0)
+            {
+                int pi = (ci - 1) / 2;
+                if (heap[ci].Priority >= heap[pi].Priority)
+                    break;
+                var tmp = heap[ci];
+                heap[ci] = heap[pi];
+                heap[pi] = tmp;
+                ci = pi;
+            }
+        }
+
+        public T Dequeue()
+        {
+            int li = heap.Count - 1;
+            var frontItem = heap[0].Item;
+            heap[0] = heap[li];
+            heap.RemoveAt(li);
+
+            --li;
+            int pi = 0;
+            while (true)
+            {
+                int ci = pi * 2 + 1;
+                if (ci > li)
+                    break;
+                int rc = ci + 1;
+                if (rc <= li && heap[rc].Priority < heap[ci].Priority)
+                    ci = rc;
+                if (heap[pi].Priority <= heap[ci].Priority)
+                    break;
+                var tmp = heap[pi];
+                heap[pi] = heap[ci];
+                heap[ci] = tmp;
+                pi = ci;
+            }
+            return frontItem;
+        }
+    }
+
+    // Step 3: Implement Dijkstra's algorithm
+    static int[] Dijkstra(int n, Dictionary<int, List<Edge>> graph, int start)
+    {
+        int[] distances = new int[n + 1];
+        for (int i = 1; i <= n; i++)
+            distances[i] = int.MaxValue;
+        distances[start] = 0;
+
+        var visited = new bool[n + 1];
+        var pq = new PriorityQueue<int>();
+        pq.Enqueue(0, start);
+
+        while (pq.Count > 0)
+        {
+            int current = pq.Dequeue();
+            if (visited[current])
+                continue;
+            visited[current] = true;
+
+            if (!graph.ContainsKey(current))
+                continue;
+
+            foreach (var edge in graph[current])
+            {
+                int neighbor = edge.To;
+                int weight = edge.Weight;
+                if (!visited[neighbor] && distances[current] + weight < distances[neighbor])
+                {
+                    distances[neighbor] = distances[current] + weight;
+                    pq.Enqueue(distances[neighbor], neighbor);
+                }
+            }
+        }
+
+        return distances;
+    }
+
+    static void Main(string[] args)
+    {
+        // Step 4: Read the number of test cases
+        int t = int.Parse(Console.ReadLine());
+        for (int testCase = 0; testCase < t; testCase++)
+        {
+            // Step 5: Read the number of nodes and edges
+            var nm = Console.ReadLine().Split();
+            int n = int.Parse(nm[0]);
+            int m = int.Parse(nm[1]);
+
+            // Step 6: Build the graph
+            var graph = new Dictionary<int, List<Edge>>();
+            var edgeWeights = new Dictionary<(int, int), int>();
+
+            for (int i = 0; i < m; i++)
+            {
+                var parts = Console.ReadLine().Split();
+                int u = int.Parse(parts[0]);
+                int v = int.Parse(parts[1]);
+                int w = int.Parse(parts[2]);
+
+                var key = u < v ? (u, v) : (v, u);
+                if (edgeWeights.ContainsKey(key))
+                {
+                    if (w < edgeWeights[key])
+                        edgeWeights[key] = w;
+                }
+                else
+                {
+                    edgeWeights[key] = w;
+                }
+            }
+
+            foreach (var kvp in edgeWeights)
+            {
+                int u = kvp.Key.Item1;
+                int v = kvp.Key.Item2;
+                int w = kvp.Value;
+
+                if (!graph.ContainsKey(u))
+                    graph[u] = new List<Edge>();
+                if (!graph.ContainsKey(v))
+                    graph[v] = new List<Edge>();
+
+                graph[u].Add(new Edge(v, w));
+                graph[v].Add(new Edge(u, w));
+            }
+
+            // Step 7: Read the starting node
+            int s = int.Parse(Console.ReadLine());
+
+            // Step 8: Compute shortest distances
+            int[] distances = Dijkstra(n, graph, s);
+
+            // Step 9: Output the results
+            for (int i = 1; i <= n; i++)
+            {
+                if (i == s)
+                    continue;
+                Console.Write((distances[i] == int.MaxValue ? -1 : distances[i]) + " ");
+            }
+            Console.WriteLine();
+        }
+    }
+}
+
+
+  </code></pre>
+</body>
+</html>
