@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Clique | HackerRank Solution</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+<style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 40px;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        h1, h2 {
+            color: #f8f8f2;
+        }
+        pre {
+            border-radius: 8px;
+            overflow: auto;
+            padding: 16px;
+            position: relative;
+        }
+        code {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+    </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        hljs.highlightAll();
+
+        document.querySelectorAll("pre").forEach(pre => {
+            const button = document.createElement("button");
+            button.innerText = "Copy";
+            button.classList.add("copy-btn");
+            pre.appendChild(button);
+
+            button.addEventListener("click", () => {
+                const code = pre.querySelector("code").innerText;
+                navigator.clipboard.writeText(code).then(() => {
+                    button.innerText = "Copied!";
+                    setTimeout(() => (button.innerText = "Copy"), 2000);
+                });
+            });
+        });
+    });
+</script>
+
+</head>
+<body>
+     <h1>Clique - HackerRank Solution</h1>
+    <p>This is the C# solution for the <a href="https://www.hackerrank.com/challenges/clique/problem" target="_blank" style="color: #1E90FF;">Clique</a> problem from HackerRank.</p>
+    
+    <h2>Source Code</h2>
+    <pre><code>
+using System;
+
+class Solution
+{
+    static void Main()
+    {
+        int t = int.Parse(Console.ReadLine());
+        for (int test = 0; test < t; test++)
+        {
+            var tokens = Console.ReadLine().Split();
+            int n = int.Parse(tokens[0]);
+            int m = int.Parse(tokens[1]);
+
+            int low = 1, high = n;
+            int result = n;
+
+            while (low <= high)
+            {
+                int mid = (low + high) / 2;
+                if (MaxEdgesWithoutClique(n, mid) < m)
+                {
+                    low = mid + 1;
+                }
+                else
+                {
+                    result = mid;
+                    high = mid - 1;
+                }
+            }
+
+            Console.WriteLine(result);
+        }
+    }
+
+    static int MaxEdgesWithoutClique(int n, int r)
+    {
+        // Using Turán's Theorem
+        double maxEdges = (1.0 - 1.0 / (r - 1)) * n * n / 2.0;
+        return (int)Math.Floor(maxEdges);
+    }
+}
+    </code></pre>
+</body>
+</html>
