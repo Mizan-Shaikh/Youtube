@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Demanding Money | HackerRank Solution</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+<style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 40px;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        h1, h2 {
+            color: #f8f8f2;
+        }
+        pre {
+            border-radius: 8px;
+            overflow: auto;
+            padding: 16px;
+            position: relative;
+        }
+        code {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+    </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        hljs.highlightAll();
+
+        document.querySelectorAll("pre").forEach(pre => {
+            const button = document.createElement("button");
+            button.innerText = "Copy";
+            button.classList.add("copy-btn");
+            pre.appendChild(button);
+
+            button.addEventListener("click", () => {
+                const code = pre.querySelector("code").innerText;
+                navigator.clipboard.writeText(code).then(() => {
+                    button.innerText = "Copied!";
+                    setTimeout(() => (button.innerText = "Copy"), 2000);
+                });
+            });
+        });
+    });
+</script>
+
+</head>
+<body>
+     <h1>Demanding Money - HackerRank Solution</h1>
+    <p>This is the C# solution for the <a href="https://www.hackerrank.com/challenges/borrowing-money/problem" target="_blank" style="color: #1E90FF;">Demanding Money</a> problem from HackerRank.</p>
+    
+    <h2>Source Code</h2>
+    <pre><code>
+using System;
+using System.Collections.Generic;
+
+class Solution
+{
+    static int n, m;
+    static int[] money;
+    static List<int>[] adj;
+    static bool[] visited;
+
+    static void Main()
+    {
+        // Read input
+        var tokens = Console.ReadLine().Split();
+        n = int.Parse(tokens[0]);
+        m = int.Parse(tokens[1]);
+
+        money = new int[n];
+        tokens = Console.ReadLine().Split();
+        for (int i = 0; i < n; i++)
+            money[i] = int.Parse(tokens[i]);
+
+        adj = new List<int>[n];
+        for (int i = 0; i < n; i++)
+            adj[i] = new List<int>();
+
+        for (int i = 0; i < m; i++)
+        {
+            tokens = Console.ReadLine().Split();
+            int u = int.Parse(tokens[0]) - 1;
+            int v = int.Parse(tokens[1]) - 1;
+            adj[u].Add(v);
+            adj[v].Add(u);
+        }
+
+        visited = new bool[n];
+        long totalMax = 0;
+        long totalWays = 1;
+
+        for (int i = 0; i < n; i++)
+        {
+            if (!visited[i])
+            {
+                var component = new List<int>();
+                DFS(i, component);
+
+                var (compMax, compWays) = ProcessComponent(component);
+                totalMax += compMax;
+                totalWays *= compWays;
+            }
+        }
+
+        Console.WriteLine($"{totalMax} {totalWays}");
+    }
+
+    static void DFS(int u, List<int> component)
+    {
+        visited[u] = true;
+        component.Add(u);
+        foreach (var v in adj[u])
+        {
+            if (!visited[v])
+                DFS(v, component);
+        }
+    }
+
+    static (long, long) ProcessComponent(List<int> component)
+    {
+        int size = component.Count;
+        if (size == 0)
+            return (0, 1);
+
+        // Map node indices to positions
+        var indexMap = new Dictionary<int, int>();
+        for (int i = 0; i < size; i++)
+            indexMap[component[i]] = i;
+
+        // Build adjacency bitmask
+        int[] neighborMask = new int[size];
+        for (int i = 0; i < size; i++)
+        {
+            int u = component[i];
+            foreach (var v in adj[u])
+            {
+                if (indexMap.ContainsKey(v))
+                    neighborMask[i] |= 1 << indexMap[v];
+            }
+        }
+
+        var dp = new Dictionary<int, (long sum, long count)>();
+        dp[0] = (0, 1);
+
+        for (int mask = 0; mask < (1 << size); mask++)
+        {
+            if (!dp.ContainsKey(mask))
+                continue;
+
+            for (int i = 0; i < size; i++)
+            {
+                int bit = 1 << i;
+                if ((mask & bit) == 0 && (mask & neighborMask[i]) == 0)
+                {
+                    int newMask = mask | bit;
+                    long newSum = dp[mask].sum + money[component[i]];
+                    if (!dp.ContainsKey(newMask))
+                        dp[newMask] = (newSum, dp[mask].count);
+                    else
+                    {
+                        if (dp[newMask].sum < newSum)
+                            dp[newMask] = (newSum, dp[mask].count);
+                        else if (dp[newMask].sum == newSum)
+                            dp[newMask] = (newSum, dp[newMask].count + dp[mask].count);
+                    }
+                }
+            }
+        }
+
+        long maxSum = 0;
+        long ways = 0;
+        foreach (var entry in dp)
+        {
+            if (entry.Value.sum > maxSum)
+            {
+                maxSum = entry.Value.sum;
+                ways = entry.Value.count;
+            }
+            else if (entry.Value.sum == maxSum)
+            {
+                ways += entry.Value.count;
+            }
+        }
+
+        return (maxSum, ways);
+    }
+}
+
+
+
+    </code></pre>
+</body>
+</html>
