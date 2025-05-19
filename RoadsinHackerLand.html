@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Roads in HackerLand | HackerRank Solution</title>
+
+  <!-- Night Owl Theme for Highlight.js -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/night-owl.min.css">
+
+  <!-- Optional: Fira Code font for better developer aesthetics -->
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #011627;
+      color: #ffffff;
+      margin: 20px;
+      line-height: 1.6;
+      font-size: 18px;
+    }
+
+    h1, h2 {
+      color: #82aaff;
+    }
+
+    a {
+      color: #7fdbca;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    pre {
+      position: relative;
+      border-radius: 10px;
+      overflow: auto;
+      padding: 20px;
+      margin-top: 20px;
+      background-color: #011627;
+    }
+
+    code {
+      font-family: 'Fira Code', 'Courier New', monospace;
+      font-size: 16px;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 6px 12px;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Ensure responsiveness on small screens */
+    @media (max-width: 600px) {
+      body {
+        font-size: 16px;
+        margin: 15px;
+      }
+
+      pre {
+        font-size: 15px;
+        padding: 15px;
+      }
+
+      .copy-btn {
+        top: 8px;
+        right: 8px;
+        font-size: 12px;
+        padding: 5px 10px;
+      }
+    }
+  </style>
+
+  <!-- Highlight.js Core Script -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      hljs.highlightAll();
+
+      document.querySelectorAll("pre").forEach(pre => {
+        const button = document.createElement("button");
+        button.innerText = "Copy";
+        button.className = "copy-btn";
+        pre.appendChild(button);
+
+        button.addEventListener("click", () => {
+          const code = pre.querySelector("code").innerText;
+          navigator.clipboard.writeText(code).then(() => {
+            button.innerText = "Copied!";
+            setTimeout(() => button.innerText = "Copy", 2000);
+          });
+        });
+      });
+    });
+  </script>
+</head>
+
+<body>
+  <h1>Roads in HackerLand - HackerRank Solution</h1>
+  <p>
+    This is the C# solution for the
+    <a href=https://www.hackerrank.com/challenges/johnland/problem" target="_blank">
+      Roads in HackerLand
+    </a>
+    problem from HackerRank.
+  </p>
+
+  <h2>Source Code</h2>
+  <pre><code class="language-csharp">
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+class Solution
+{
+    class Edge
+    {
+        public int U, V;
+        public int Weight;
+        public Edge(int u, int v, int weight)
+        {
+            U = u;
+            V = v;
+            Weight = weight;
+        }
+    }
+
+    class UnionFind
+    {
+        private int[] parent;
+        private int[] size;
+
+        public UnionFind(int n)
+        {
+            parent = new int[n];
+            size = new int[n];
+            for (int i = 0; i < n; i++)
+            {
+                parent[i] = i;
+                size[i] = 1;
+            }
+        }
+
+        public int Find(int x)
+        {
+            if (parent[x] != x)
+                parent[x] = Find(parent[x]);
+            return parent[x];
+        }
+
+        public bool Union(int x, int y)
+        {
+            int rootX = Find(x);
+            int rootY = Find(y);
+            if (rootX == rootY)
+                return false;
+
+            // Union by size
+            if (size[rootX] < size[rootY])
+            {
+                parent[rootX] = rootY;
+                size[rootY] += size[rootX];
+            }
+            else
+            {
+                parent[rootY] = rootX;
+                size[rootX] += size[rootY];
+            }
+            return true;
+        }
+
+        public int GetSize(int x)
+        {
+            return size[Find(x)];
+        }
+    }
+
+    static void Main(string[] args)
+    {
+        string[] tokens = Console.ReadLine().Split();
+        int n = int.Parse(tokens[0]);
+        int m = int.Parse(tokens[1]);
+
+        List<Edge> edges = new List<Edge>();
+        for (int i = 0; i < m; i++)
+        {
+            tokens = Console.ReadLine().Split();
+            int u = int.Parse(tokens[0]) - 1;
+            int v = int.Parse(tokens[1]) - 1;
+            int w = int.Parse(tokens[2]);
+            edges.Add(new Edge(u, v, w));
+        }
+
+        // Sort edges by weight
+        edges.Sort((a, b) => a.Weight.CompareTo(b.Weight));
+
+        UnionFind uf = new UnionFind(n);
+        long total = 0;
+
+        foreach (var edge in edges)
+        {
+            int uRoot = uf.Find(edge.U);
+            int vRoot = uf.Find(edge.V);
+            if (uRoot != vRoot)
+            {
+                long sizeU = uf.GetSize(edge.U);
+                long sizeV = uf.GetSize(edge.V);
+                total += (long)edge.Weight * sizeU * sizeV;
+                uf.Union(uRoot, vRoot);
+            }
+        }
+
+        Console.WriteLine(Convert.ToString(total, 2));
+    }
+}
+
+
+  </code></pre>
+</body>
+</html>
